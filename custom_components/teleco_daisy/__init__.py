@@ -21,6 +21,36 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
+  async def handle_feed_command(call: ServiceCall):
+        device_code = call.data["deviceCode"]
+        id_device = call.data["idInstallationDevice"]
+        command_action = call.data["commandAction"]
+        command_id = call.data["commandId"]
+        command_param = call.data["commandParam"]
+        lowlevel = call.data.get("lowlevelCommand")
+
+        # Instanz des Clients (TelecoDaisy) und Installation holen:
+        client: TelecoDaisy = hass.data[DOMAIN]["client"]
+        installation: DaisyInstallation = hass.data[DOMAIN]["installation"]
+
+        command = {
+            "commandAction": command_action,
+            "commandId": command_id,
+            "commandParam": command_param,
+            "deviceCode": str(device_code),
+            "idInstallationDevice": id_device,
+        }
+        if lowlevel:
+            command["lowlevelCommand"] = lowlevel
+
+        await hass.async_add_executor_job(
+            lambda: client.feed_the_commands(installation, [command])
+        )
+
+    hass.services.async_register(DOMAIN, "feed_command", handle_feed_command)
+
+    return True
+
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
