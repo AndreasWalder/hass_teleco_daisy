@@ -1,0 +1,28 @@
+feed_command:
+  name: Feed Teleco Command
+  description: Sends a raw command directly to a Daisy device
+  fields:
+    deviceCode:
+      required: true
+      selector:
+        text:
+    idInstallationDevice:
+      required: true
+      selector:
+        number:
+    commandAction:
+      required: true
+      selector:
+        text:
+    commandId:
+      required: true
+      selector:
+        number:
+    commandParam:
+      required: true
+      selector:
+        text:
+    lowlevelCommand:
+      required: false
+      selector:
+        text:
